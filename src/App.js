@@ -1,24 +1,61 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import LocationSearchBar from "./components/LocationSearchBar";
+import WeatherResults from "./components/WeatherResults";
+import Map from "./components/Map";
 
 function App() {
+  const [coordinatesToCheck, setCoordinatesToCheck] = useState([]);
+  const [locationData, setLocationData] = useState([]);
+  const [weatherData, setWeatherData] = useState([]);
+  const [tripData, setTripData] = useState({
+    startLocation: { name: "", lat: "", lon: "" },
+    endLocation: { name: "", lat: "", lon: "" },
+  });
+  const [route, setRoute] = useState({
+    start: "",
+    end: "",
+  });
+  const [responseCount, setResponseCount] = useState(0);
+
+  function handleSubmit() {
+    console.log(tripData);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <div className="app-wrapper">
+        <LocationSearchBar
+          type="start"
+          tripData={tripData}
+          setTripData={setTripData}
+        />
+        <LocationSearchBar
+          type="end"
+          tripData={tripData}
+          setTripData={setTripData}
+        />
+
+        <Map
+          responseCount={responseCount}
+          setResponseCount={setResponseCount}
+          route={route}
+          coordinatesToCheck={coordinatesToCheck}
+        />
+
+        <WeatherResults
+          responseCount={responseCount}
+          setResponseCount={setResponseCount}
+          tripData={tripData}
+          route={route}
+          setRoute={setRoute}
+          coordinatesToCheck={coordinatesToCheck}
+          setCoordinatesToCheck={setCoordinatesToCheck}
+        />
+      </div>
+    </>
   );
 }
 
