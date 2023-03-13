@@ -24,36 +24,47 @@ function App() {
     console.log(tripData);
   }
 
+  const startSearch = (
+    <LocationSearchBar
+      type="start"
+      tripData={tripData}
+      setTripData={setTripData}
+    />
+  );
+  const endSearch = (
+    <LocationSearchBar
+      type="end"
+      tripData={tripData}
+      setTripData={setTripData}
+    />
+  );
+  const map = (
+    <Map
+      responseCount={responseCount}
+      setResponseCount={setResponseCount}
+      route={route}
+      coordinatesToCheck={coordinatesToCheck}
+    />
+  );
+  const weather = (
+    <WeatherResults
+      responseCount={responseCount}
+      setResponseCount={setResponseCount}
+      tripData={tripData}
+      route={route}
+      setRoute={setRoute}
+      coordinatesToCheck={coordinatesToCheck}
+      setCoordinatesToCheck={setCoordinatesToCheck}
+    />
+  );
+
   return (
     <>
       <div className="app-wrapper">
-        <LocationSearchBar
-          type="start"
-          tripData={tripData}
-          setTripData={setTripData}
-        />
-        <LocationSearchBar
-          type="end"
-          tripData={tripData}
-          setTripData={setTripData}
-        />
-
-        <Map
-          responseCount={responseCount}
-          setResponseCount={setResponseCount}
-          route={route}
-          coordinatesToCheck={coordinatesToCheck}
-        />
-
-        <WeatherResults
-          responseCount={responseCount}
-          setResponseCount={setResponseCount}
-          tripData={tripData}
-          route={route}
-          setRoute={setRoute}
-          coordinatesToCheck={coordinatesToCheck}
-          setCoordinatesToCheck={setCoordinatesToCheck}
-        />
+        {startSearch}
+        {endSearch}
+        {map}
+        {weather}
       </div>
     </>
   );

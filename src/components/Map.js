@@ -38,8 +38,6 @@ const Map = ({
       }
     }, 1500);
 
-    console.log(response.geocoded_waypoints.length);
-
     if (responseCount === response.geocoded_waypoints.length) {
       clearTimeout(myTimeout);
     }
@@ -69,15 +67,17 @@ const Map = ({
                 directions: response,
               }}
             />
-            {coordinatesToCheck.map((coordinate, index) => {
-              return (
-                <Marker
-                  onLoad={onLoad}
-                  position={{ lat: coordinate[1], lng: coordinate[0] }}
-                  label="Raining"
-                />
-              );
-            })}
+            {coordinatesToCheck.length > 0
+              ? coordinatesToCheck.map((coordinate, index) => {
+                  return (
+                    <Marker
+                      onLoad={onLoad}
+                      position={{ lat: coordinate[1], lng: coordinate[0] }}
+                      label="Raining"
+                    />
+                  );
+                })
+              : ""}
           </>
         ) : (
           ""
