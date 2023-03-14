@@ -68,15 +68,23 @@ const Map = ({
               }}
             />
             {coordinatesToCheck.length > 0
-              ? coordinatesToCheck.map((coordinate, index) => {
-                  return (
-                    <Marker
-                      onLoad={onLoad}
-                      position={{ lat: coordinate[1], lng: coordinate[0] }}
-                      label="Raining"
-                    />
-                  );
-                })
+              ? coordinatesToCheck
+                  .filter((coordinate, index) => {
+                    const lastIndex = coordinatesToCheck.length - 1;
+                    return index != lastIndex && index != 0;
+                  })
+                  .map((coordinate, index) => {
+                    return (
+                      <Marker
+                        onLoad={onLoad}
+                        position={{
+                          lat: coordinate.location[1],
+                          lng: coordinate.location[0],
+                        }}
+                        label="Raining"
+                      />
+                    );
+                  })
               : ""}
           </>
         ) : (

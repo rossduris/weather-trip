@@ -14,6 +14,30 @@ const WeatherResults = ({
   const [weatherData, setWeatherData] = useState();
   const [steps, setSteps] = useState();
   const [spots, setSpots] = useState();
+  const [weatherForTrip, setWeatherForTrip] = useState();
+
+  const getWeather = async (coordinate) => {
+    const options = {
+      method: "GET",
+      url: "https://weatherapi-com.p.rapidapi.com/forecast.json",
+      params: { q: coordinate },
+      headers: {
+        "X-RapidAPI-Key": process.env.REACT_APP_RAPID_API_KEY,
+        "X-RapidAPI-Host": "weatherapi-com.p.rapidapi.com",
+      },
+    };
+
+    await axios
+      .request(options)
+      .then(function (response) {
+        setWeatherData(response.data);
+        // console.log(response.data);
+        // return response.data.forecast.forecastday[0].hour;
+      })
+      .catch(function (error) {
+        console.error(error);
+      });
+  };
 
   async function getTripPlan() {
     setResponseCount(0);
@@ -53,31 +77,23 @@ const WeatherResults = ({
     });
   }
 
-  async function getWeather() {
+  function getDistance(point1, point2) {
+    const axios = require("axios");
+
     const options = {
       method: "GET",
-      url: "https://visual-crossing-weather.p.rapidapi.com/forecast",
-      params: {
-        location:
-          tripData != null
-            ? `${coordinatesToCheck[0][1]},${coordinatesToCheck[0][0]}`
-            : "",
-
-        aggregateHours: "1",
-        shortColumnNames: "0",
-        unitGroup: "us",
-        contentType: "csv",
-      },
+      url: "https://distanceto.p.rapidapi.com/get",
+      params: { route: "<REQUIRED>", car: "false" },
       headers: {
         "X-RapidAPI-Key": process.env.REACT_APP_RAPID_API_KEY,
-        "X-RapidAPI-Host": "visual-crossing-weather.p.rapidapi.com",
+        "X-RapidAPI-Host": "distanceto.p.rapidapi.com",
       },
     };
 
-    await axios
+    axios
       .request(options)
       .then(function (response) {
-        setWeatherData(response.data);
+        console.log(response.data);
       })
       .catch(function (error) {
         console.error(error);
@@ -86,60 +102,42 @@ const WeatherResults = ({
 
   useEffect(() => {
     console.log("coordinates updated");
-    getWeather();
   }, [coordinatesToCheck]);
 
   useEffect(() => {
     const tripCoords = [];
-    // Find trip distance in hours
-    // Add together trip length parts and every hour add to coordinates to check
+
     if (tripResults) {
-      tripCoords.push(tripResults.features[0].geometry.coordinates[0][0]);
-
-      tripCoords.push(
-        tripResults.features[0].geometry.coordinates[0][
-          Math.round(
-            tripResults.features[0].geometry.coordinates[0].length * 0.2
-          )
-        ]
-      );
-
-      tripCoords.push(
-        tripResults.features[0].geometry.coordinates[0][
-          Math.round(
-            tripResults.features[0].geometry.coordinates[0].length * 0.4
-          )
-        ]
-      );
-
-      tripCoords.push(
-        tripResults.features[0].geometry.coordinates[0][
-          Math.round(
-            tripResults.features[0].geometry.coordinates[0].length * 0.6
-          )
-        ]
-      );
-      tripCoords.push(
-        tripResults.features[0].geometry.coordinates[0][
-          Math.round(
-            tripResults.features[0].geometry.coordinates[0].length * 0.8
-          )
-        ]
-      );
-      tripCoords.push(
-        tripResults.features[0].geometry.coordinates[0][
-          tripResults.features[0].geometry.coordinates[0].length - 1
-        ]
-      );
+      const coordinates = tripResults.features[0].geometry.coordinates[0];
+      tripCoords.push({ location: coordinates[0][0], weather: {} });
+      tripCoords.push({
+        location: coordinates[0][Math.round(coordinates[0].length - 1)],
+        weather: {},
+      });
+      tripCoords.push({
+        location: coordinates[0][Math.round(coordinates[0].length * 0.2)],
+        weather: {},
+      });
+      tripCoords.push({
+        location: coordinates[0][Math.round(coordinates[0].length * 0.4)],
+        weather: {},
+      });
+      tripCoords.push({
+        location: coordinates[0][Math.round(coordinates[0].length * 0.3)],
+        weather: {},
+      });
+      tripCoords.push({
+        location: coordinates[0][Math.round(coordinates[0].length * 0.6)],
+        weather: {},
+      });
+      tripCoords.push({
+        location: coordinates[0][Math.round(coordinates[0].length * 0.7)],
+        weather: {},
+      });
     }
     setCoordinatesToCheck(tripCoords);
-  }, [tripResults]);
 
-  useEffect(() => {
     if (tripResults != null) {
-      // tripResults.features[0].properties.legs[0].steps.map((step) => {
-      //   return console.log(step);
-      // });
       setSteps(tripResults.features[0].properties.legs[0].steps);
     }
   }, [tripResults]);
@@ -157,7 +155,6 @@ const WeatherResults = ({
         time += steps[i].time;
         const hours = time / 60 / 60;
         if (hours > 1) {
-          console.log(steps[i]);
           spotsToCheck.push(steps[i].from_index);
           time = 0;
         }
@@ -169,18 +166,40 @@ const WeatherResults = ({
   return (
     <>
       <div>
-        {coordinatesToCheck.map((coordinate) => {
-          return <div>{coordinate}</div>;
+        <button onClick={getTripPlan}>Submit</button>
+      </div>
+      <div>
+        {coordinatesToCheck.map((coordinate, index) => {
+          return <div>{`${coordinate.location}`}</div>;
         })}
       </div>
-      {/* <div>
+      <div>
         {tripResults
-          ? `${JSON.stringify(tripResults)}`
+          ? `${JSON.stringify(weatherForTrip)}`
           : "Loading directions..."}
-      </div> */}
+      </div>
       <div>
         {weatherData ? (
-          <div>{JSON.stringify(weatherData.split("03/")[1])}</div>
+          <>
+            {coordinatesToCheck.map((coordinate, index) => {
+              return (
+                <div className="weatherBox">
+                  <h3>{`${coordinate[1]}, ${coordinate[0]}`}</h3>
+                  <div>
+                    {JSON.stringify(
+                      weatherData.forecast.forecastday[0].hour[index].time
+                    )}
+                  </div>
+                  <div>
+                    {JSON.stringify(
+                      weatherData.forecast.forecastday[0].hour[index].condition
+                        .text
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </>
         ) : (
           "Loading weather..."
         )}
