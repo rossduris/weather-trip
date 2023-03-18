@@ -1,5 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+// import getWeather from "../api/getWeather";
+import getDistance from "../api/getDistance";
 
 const WeatherResults = ({
   tripData,
@@ -11,33 +13,11 @@ const WeatherResults = ({
   setCoordinatesToCheck,
 }) => {
   const [tripResults, setTripResults] = useState();
-  const [weatherData, setWeatherData] = useState();
+  // const [weatherData, setWeatherData] = useState();
   const [steps, setSteps] = useState();
   const [spots, setSpots] = useState();
-  const [weatherForTrip, setWeatherForTrip] = useState();
-
-  const getWeather = async (coordinate) => {
-    const options = {
-      method: "GET",
-      url: "https://weatherapi-com.p.rapidapi.com/forecast.json",
-      params: { q: coordinate },
-      headers: {
-        "X-RapidAPI-Key": process.env.REACT_APP_RAPID_API_KEY,
-        "X-RapidAPI-Host": "weatherapi-com.p.rapidapi.com",
-      },
-    };
-
-    await axios
-      .request(options)
-      .then(function (response) {
-        setWeatherData(response.data);
-        // console.log(response.data);
-        // return response.data.forecast.forecastday[0].hour;
-      })
-      .catch(function (error) {
-        console.error(error);
-      });
-  };
+  const [weatherForTrip, setWeatherForTrip] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   async function getTripPlan() {
     setResponseCount(0);
@@ -77,133 +57,83 @@ const WeatherResults = ({
     });
   }
 
-  function getDistance(point1, point2) {
-    const axios = require("axios");
+  let results = [];
 
+  const getWeather = (coordinate) => {
     const options = {
       method: "GET",
-      url: "https://distanceto.p.rapidapi.com/get",
-      params: { route: "<REQUIRED>", car: "false" },
+      url: "https://weatherapi-com.p.rapidapi.com/forecast.json",
+      params: { q: coordinate },
       headers: {
         "X-RapidAPI-Key": process.env.REACT_APP_RAPID_API_KEY,
-        "X-RapidAPI-Host": "distanceto.p.rapidapi.com",
+        "X-RapidAPI-Host": "weatherapi-com.p.rapidapi.com",
       },
     };
 
     axios
       .request(options)
       .then(function (response) {
-        console.log(response.data);
+        const weatherText =
+          response.data.forecast.forecastday[0].hour[0].condition.text;
+        results.push({
+          location: coordinate,
+          hour: 0,
+          text: weatherText,
+        });
       })
       .catch(function (error) {
         console.error(error);
       });
-  }
+  };
 
   useEffect(() => {
     console.log("coordinates updated");
+    setLoading(true);
+    if (coordinatesToCheck) {
+      coordinatesToCheck.forEach((coord, i) => {
+        if (coord[0]) {
+          console.log("getting data for hour: ", coord[1]);
+          console.log(coord[0][1], coord[0][0]);
+          getWeather(`${coord[0][1]}, ${coord[0][0]}`);
+        }
+      });
+      // results.sort((a, b) => (a.hour > b.hour ? 1 : b.hour > a.hour ? -1 : 0));
+      setWeatherForTrip(results);
+    }
+
+    setLoading(false);
   }, [coordinatesToCheck]);
 
   useEffect(() => {
     const tripCoords = [];
-
+    // Find trip distance in hours
     if (tripResults) {
-      const coordinates = tripResults.features[0].geometry.coordinates[0];
-      tripCoords.push({ location: coordinates[0][0], weather: {} });
-      tripCoords.push({
-        location: coordinates[0][Math.round(coordinates[0].length - 1)],
-        weather: {},
-      });
-      tripCoords.push({
-        location: coordinates[0][Math.round(coordinates[0].length * 0.2)],
-        weather: {},
-      });
-      tripCoords.push({
-        location: coordinates[0][Math.round(coordinates[0].length * 0.4)],
-        weather: {},
-      });
-      tripCoords.push({
-        location: coordinates[0][Math.round(coordinates[0].length * 0.3)],
-        weather: {},
-      });
-      tripCoords.push({
-        location: coordinates[0][Math.round(coordinates[0].length * 0.6)],
-        weather: {},
-      });
-      tripCoords.push({
-        location: coordinates[0][Math.round(coordinates[0].length * 0.7)],
-        weather: {},
-      });
-    }
-    setCoordinatesToCheck(tripCoords);
-
-    if (tripResults != null) {
-      setSteps(tripResults.features[0].properties.legs[0].steps);
+      const coords = tripResults.features[0].geometry.coordinates[0];
+      if (tripResults) {
+        tripCoords.push([coords[0], 1]);
+        tripCoords.push([coords[Math.round(coords.length * 0.2)], 2]);
+        tripCoords.push([coords[Math.round(coords.length * 0.4)], 3]);
+        tripCoords.push([coords[Math.round(coords.length * 0.3)], 4]);
+        tripCoords.push([coords[Math.round(coords.length * 0.6)], 5]);
+        tripCoords.push([coords[Math.round(coords.length * 0.7)], 6]);
+        tripCoords.push([coords[coords.length - 1], 7]);
+      }
+      setCoordinatesToCheck(tripCoords);
     }
   }, [tripResults]);
-
-  useEffect(() => {
-    if (tripResults != null && steps != null) {
-      const hours = Math.round(
-        tripResults.features[0].properties.time / 60 / 60
-      );
-      const stepsCount = steps.length;
-      const rounds = Math.round(stepsCount / hours);
-      let time = 0;
-      let spotsToCheck = [];
-      for (let i = 0; i < stepsCount; i++) {
-        time += steps[i].time;
-        const hours = time / 60 / 60;
-        if (hours > 1) {
-          spotsToCheck.push(steps[i].from_index);
-          time = 0;
-        }
-      }
-      setSpots(spotsToCheck);
-    }
-  }, [steps]);
 
   return (
     <>
       <div>
-        <button onClick={getTripPlan}>Submit</button>
+        <button onClick={getTripPlan} disabled={loading}>
+          {loading ? "Loading..." : "Submit"}
+        </button>
       </div>
-      <div>
-        {coordinatesToCheck.map((coordinate, index) => {
-          return <div>{`${coordinate.location}`}</div>;
-        })}
-      </div>
-      <div>
-        {tripResults
-          ? `${JSON.stringify(weatherForTrip)}`
-          : "Loading directions..."}
-      </div>
-      <div>
-        {weatherData ? (
-          <>
-            {coordinatesToCheck.map((coordinate, index) => {
-              return (
-                <div className="weatherBox">
-                  <h3>{`${coordinate[1]}, ${coordinate[0]}`}</h3>
-                  <div>
-                    {JSON.stringify(
-                      weatherData.forecast.forecastday[0].hour[index].time
-                    )}
-                  </div>
-                  <div>
-                    {JSON.stringify(
-                      weatherData.forecast.forecastday[0].hour[index].condition
-                        .text
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </>
-        ) : (
-          "Loading weather..."
-        )}
-      </div>
+      {weatherForTrip ? (
+        <div>{JSON.stringify(weatherForTrip)}</div>
+      ) : (
+        "Loading..."
+      )}
     </>
   );
 };

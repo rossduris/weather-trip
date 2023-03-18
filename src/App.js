@@ -9,7 +9,7 @@ import Map from "./components/Map";
 function App() {
   const [coordinatesToCheck, setCoordinatesToCheck] = useState([]);
   const [locationData, setLocationData] = useState([]);
-  const [weatherData, setWeatherData] = useState([]);
+  // const [weatherData, setWeatherData] = useState([]);
   const [tripData, setTripData] = useState({
     startLocation: { name: "", lat: "", lon: "" },
     endLocation: { name: "", lat: "", lon: "" },

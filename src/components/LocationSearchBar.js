@@ -75,7 +75,9 @@ const LocationSearchBar = ({ type, tripData, setTripData }) => {
 
   useEffect(() => {
     // Get autocomplete search value
-    searchValue.length > 0 ? getAutoComplete() : console.log("empty");
+    setTimeout(() => {
+      searchValue.length > 0 ? getAutoComplete() : console.log("empty");
+    }, 500);
   }, [searchValue]);
 
   document.body.addEventListener("click", () => setIsSearching(false));
@@ -94,7 +96,7 @@ const LocationSearchBar = ({ type, tripData, setTripData }) => {
             <div>{searchResults.features[0].properties.address_line1}</div>
             <div>
               {searchResults.features[0].properties.lat},
-              {searchResults.features[0].properties.lat}
+              {searchResults.features[0].properties.lon}
             </div>
             {/* <div>
             {searchResults.features.map((prop) => {

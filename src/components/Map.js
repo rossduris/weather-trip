@@ -44,7 +44,7 @@ const Map = ({
   }
 
   const onLoad = (marker) => {
-    console.log("marker: ", marker);
+    // console.log("marker: ", marker);
   };
 
   return (
@@ -78,8 +78,8 @@ const Map = ({
                       <Marker
                         onLoad={onLoad}
                         position={{
-                          lat: coordinate.location[1],
-                          lng: coordinate.location[0],
+                          lat: coordinate[0][1],
+                          lng: coordinate[0][0],
                         }}
                         label="Raining"
                       />
