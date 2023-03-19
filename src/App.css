@@ -13,3 +13,19 @@
   padding: 0.5em;
   border: 1px solid gray;
 }
+
+.weather-data button {
+  background-color: blue;
+  border: none;
+  color: white;
+  padding: 1em 2em;
+  margin: 1em 0;
+  cursor: pointer;
+}
+.weather-data button:hover {
+  background-color: darkblue;
+}
+.weather-data button:disabled {
+  background-color: rgb(14, 14, 171);
+  cursor: default;
+}

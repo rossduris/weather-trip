@@ -9,14 +9,18 @@ import Map from "./components/Map";
 function App() {
   const [coordinatesToCheck, setCoordinatesToCheck] = useState([]);
   const [locationData, setLocationData] = useState([]);
-  // const [weatherData, setWeatherData] = useState([]);
+  const [weatherForTrip, setWeatherForTrip] = useState();
   const [tripData, setTripData] = useState({
-    startLocation: { name: "", lat: "", lon: "" },
-    endLocation: { name: "", lat: "", lon: "" },
+    startLocation: {
+      name: "Savannah, GA",
+      lat: "32.0564572",
+      lon: "-81.0951271",
+    },
+    endLocation: { name: "Atlanta, GA", lat: "33.7489924", lon: "-84.3902644" },
   });
   const [route, setRoute] = useState({
-    start: "",
-    end: "",
+    start: "Savannah, GA",
+    end: "Atlanta, GA",
   });
   const [responseCount, setResponseCount] = useState(0);
 
@@ -44,6 +48,8 @@ function App() {
       setResponseCount={setResponseCount}
       route={route}
       coordinatesToCheck={coordinatesToCheck}
+      weatherForTrip={weatherForTrip}
+      setWeatherForTrip={setWeatherForTrip}
     />
   );
   const weather = (
@@ -55,6 +61,8 @@ function App() {
       setRoute={setRoute}
       coordinatesToCheck={coordinatesToCheck}
       setCoordinatesToCheck={setCoordinatesToCheck}
+      weatherForTrip={weatherForTrip}
+      setWeatherForTrip={setWeatherForTrip}
     />
   );
 

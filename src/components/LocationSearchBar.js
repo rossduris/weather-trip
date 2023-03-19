@@ -2,11 +2,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 const LocationSearchBar = ({ type, tripData, setTripData }) => {
-  const locations = ["Columbus, OH", "New York, New York", "Gahanna, Ohio"];
   const [searchValue, setSearchValue] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState();
-  const [results, setResults] = useState({});
 
   function handleChange(event) {
     setIsSearching(true);
@@ -65,7 +63,7 @@ const LocationSearchBar = ({ type, tripData, setTripData }) => {
     axios
       .request(options)
       .then(function (response) {
-        console.log(response.data);
+        console.log("getting search response", response.data);
         setSearchResults(response.data);
       })
       .catch(function (error) {
@@ -73,11 +71,22 @@ const LocationSearchBar = ({ type, tripData, setTripData }) => {
       });
   }
 
+  function debounce(func, delay = 1000) {
+    let timeoutId;
+
+    return function (...args) {
+      clearTimeout(timeoutId);
+      console.log("debounce running");
+      timeoutId = setTimeout(() => {
+        func.apply(this, args);
+      }, delay);
+    };
+  }
+
   useEffect(() => {
-    // Get autocomplete search value
-    setTimeout(() => {
-      searchValue.length > 0 ? getAutoComplete() : console.log("empty");
-    }, 500);
+    if (searchValue.length > 0) {
+      debounce(getAutoComplete());
+    }
   }, [searchValue]);
 
   document.body.addEventListener("click", () => setIsSearching(false));
@@ -88,7 +97,13 @@ const LocationSearchBar = ({ type, tripData, setTripData }) => {
         type="text"
         placeholder={type === "start" ? "Start Location" : "End Location"}
         onChange={handleChange}
-        value={searchValue}
+        value={
+          !searchValue && type === "start"
+            ? "Savannah, GA"
+            : !searchValue && type === "end"
+            ? "Atlanta, GA"
+            : searchValue
+        }
       />
       {isSearching ? (
         searchResults && searchResults.features && searchResults.features[0] ? (

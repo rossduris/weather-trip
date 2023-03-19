@@ -8,6 +8,7 @@ import {
   DirectionsService,
   DirectionsRenderer,
 } from "@react-google-maps/api";
+import logo from "../logo.svg";
 
 const containerStyle = {
   width: "400px",
@@ -20,6 +21,8 @@ const Map = ({
   responseCount,
   setResponseCount,
   coordinatesToCheck,
+  weatherForTrip,
+  setWeatherForTrip,
 }) => {
   const [response, setResponse] = useState("");
 
@@ -67,24 +70,20 @@ const Map = ({
                 directions: response,
               }}
             />
-            {coordinatesToCheck.length > 0
-              ? coordinatesToCheck
-                  .filter((coordinate, index) => {
-                    const lastIndex = coordinatesToCheck.length - 1;
-                    return index != lastIndex && index != 0;
-                  })
-                  .map((coordinate, index) => {
-                    return (
-                      <Marker
-                        onLoad={onLoad}
-                        position={{
-                          lat: coordinate[0][1],
-                          lng: coordinate[0][0],
-                        }}
-                        label="Raining"
-                      />
-                    );
-                  })
+            {weatherForTrip
+              ? weatherForTrip.map((marker) => {
+                  const location = marker.location.split(",");
+                  return (
+                    <Marker
+                      onLoad={onLoad}
+                      position={{
+                        lat: Number(location[0]),
+                        lng: Number(location[1]),
+                      }}
+                      label={marker.text}
+                    />
+                  );
+                })
               : ""}
           </>
         ) : (

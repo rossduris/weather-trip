@@ -3,11 +3,14 @@ import axios from "axios";
 function getDistance(point1, point2) {
   const options = {
     method: "GET",
-    url: "https://distanceto.p.rapidapi.com/get",
-    params: { route: "<REQUIRED>", car: "false" },
+    url: "https://trueway-matrix.p.rapidapi.com/CalculateDrivingMatrix",
+    params: {
+      origins: point1,
+      destinations: point2,
+    },
     headers: {
-      "X-RapidAPI-Key": process.env.REACT_APP_RAPID_API_KEY,
-      "X-RapidAPI-Host": "distanceto.p.rapidapi.com",
+      "X-RapidAPI-Key": "3ba367c919msh8d947653e42526cp1a49bfjsn21e4f7cb1630",
+      "X-RapidAPI-Host": "trueway-matrix.p.rapidapi.com",
     },
   };
 
