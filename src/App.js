@@ -69,10 +69,12 @@ function App() {
   return (
     <>
       <div className="app-wrapper">
-        {startSearch}
-        {endSearch}
-        {map}
-        {weather}
+        <div className="left-panel">
+          {startSearch}
+          {endSearch}
+          {map}
+        </div>
+        <div className="right-panel">{weather}</div>
       </div>
     </>
   );

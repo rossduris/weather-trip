@@ -1,7 +1,5 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-// import getWeather from "../api/getWeather";
-import getDistance from "../api/getDistance";
 
 const WeatherResults = ({
   tripData,
@@ -12,15 +10,15 @@ const WeatherResults = ({
   setCoordinatesToCheck,
 }) => {
   const [tripResults, setTripResults] = useState();
-  // const [weatherData, setWeatherData] = useState();
-  const [steps, setSteps] = useState();
-  const [spots, setSpots] = useState();
   const [loading, setLoading] = useState(false);
+  const [checkWeatherCount, setCheckWeatherCount] = useState(2);
+  const [weatherObjects, setWeatherObjects] = useState([]);
+  const [distanceData, setDistanceData] = useState();
 
   async function getTripPlan() {
     setLoading(true);
     setResponseCount(0);
-
+    setTripResults(null);
     const options = {
       method: "GET",
       url: "https://multimodal-trip-planner.p.rapidapi.com/v1/routing",
@@ -38,7 +36,7 @@ const WeatherResults = ({
       .request(options)
       .then(function (response) {
         setTripResults(response.data);
-        console.log(tripResults);
+
         setRoute({
           start: tripData.startLocation.name,
           end: tripData.endLocation.name,
@@ -78,45 +76,114 @@ const WeatherResults = ({
       });
   };
 
+  function getDistance(origins, destinations) {
+    const options = {
+      method: "GET",
+      url: "https://trueway-matrix.p.rapidapi.com/CalculateDrivingMatrix",
+      params: {
+        origins: origins,
+        destinations: destinations,
+      },
+      headers: {
+        "X-RapidAPI-Key": process.env.REACT_APP_RAPID_API_KEY,
+        "X-RapidAPI-Host": "trueway-matrix.p.rapidapi.com",
+      },
+    };
+
+    axios
+      .request(options)
+      .then(function (response) {
+        setDistanceData(response.data);
+      })
+      .catch(function (error) {
+        console.error(error);
+      });
+  }
+
   useEffect(() => {
     const tripCoords = [];
+    const tripObjs = [];
     // Find trip distance in hours
     if (tripResults) {
-      const coords = tripResults.features[0].geometry.coordinates[0];
+      const coords = new Array(
+        tripResults.features[0].geometry.coordinates[0].length
+      );
+      tripResults.features[0].geometry.coordinates[0].forEach(
+        (coordinate, i) => {
+          coords[i] = `${coordinate[1]},${coordinate[0]}`;
+        }
+      );
 
-      tripCoords.push(coords[0]);
-      tripCoords.push(coords[Math.round(coords.length * 0.2)]);
-      tripCoords.push(coords[Math.round(coords.length * 0.3)]);
-      tripCoords.push(coords[Math.round(coords.length * 0.4)]);
-      tripCoords.push(coords[Math.round(coords.length * 0.6)]);
-      tripCoords.push(coords[Math.round(coords.length * 0.7)]);
+      let grain = 10;
+
+      let increment = grain / checkWeatherCount / 10;
+      let indexToGet = 0;
+
+      for (let i = 0; i < checkWeatherCount; i++) {
+        console.log(indexToGet.toFixed(2));
+
+        tripCoords.push(coords[Math.round(coords.length * indexToGet)]);
+
+        let weatherObj = {
+          coordinate: coords[Math.round(coords.length * indexToGet)],
+          distance: ``,
+          duration: ``,
+          weather: ``,
+        };
+        tripObjs.push(weatherObj);
+
+        indexToGet += increment;
+      }
+      //Get last coordintate for trip
       tripCoords.push(coords[coords.length - 1]);
+
+      let weatherObj = {
+        coordinate: coords[coords.length - 1],
+        distance: `0`,
+        duration: `0`,
+        weather: ``,
+      };
+      tripObjs.push(weatherObj);
+      setWeatherObjects(tripObjs);
 
       setCoordinatesToCheck(tripCoords);
 
-      tripCoords.forEach((coord, i) => {
-        getWeather(`${coord[1]}, ${coord[0]}`, i);
-      });
+      let len = tripCoords.length;
+      let origins = `${tripCoords[0]}`;
+      let destinations = ``;
+      for (let i = 1; i < len; i++) {
+        if (i === len - 1) {
+          destinations += `${tripCoords[i]}`;
+        } else {
+          destinations += `${tripCoords[i]};`;
+        }
+      }
 
-      setWeatherForTrip(results);
+      console.log(origins, destinations);
+      getDistance(origins, destinations);
 
-      console.log(`${tripCoords[1][1]}, ${tripCoords[1][0]};
-      ${tripCoords[2][1]}, ${tripCoords[2][0]};
-      ${tripCoords[3][1]}, ${tripCoords[3][0]};
-      ${tripCoords[4][1]}, ${tripCoords[4][0]}
-     `);
-      getDistance(
-        `${tripCoords[0][1]}, ${tripCoords[0][0]}`,
-        `${tripCoords[1][1]}, ${tripCoords[1][0]};
-         ${tripCoords[2][1]}, ${tripCoords[2][0]};
-         ${tripCoords[3][1]}, ${tripCoords[3][0]};
-         ${tripCoords[4][1]}, ${tripCoords[4][0]}
-        `
-      );
+      // setWeatherForTrip(results);
     }
 
     setLoading(false);
   }, [tripResults]);
+
+  useEffect(() => {
+    if (distanceData) {
+      weatherObjects
+        ? weatherObjects.forEach((obj, i) => {
+            if (i != 0) {
+              obj.duration = distanceData.durations[0][i - 1];
+              obj.distance = distanceData.distances[0][i - 1];
+            }
+          })
+        : console.log("no objs yet");
+      setWeatherObjects((prev) => prev);
+      console.log(weatherObjects);
+    } else {
+      console.log("no data");
+    }
+  }, [distanceData]);
 
   return (
     <>
@@ -124,6 +191,19 @@ const WeatherResults = ({
         <button onClick={getTripPlan} disabled={loading}>
           {loading ? "Loading..." : "Get Weather"}
         </button>
+        <span>
+          <span className="marker-title">
+            Marker Count: {checkWeatherCount - 1}
+          </span>
+          <input
+            min={2}
+            max={20}
+            onChange={(e) => setCheckWeatherCount(e.target.value)}
+            type="number"
+            placeholder="Weather Checkpoints"
+            value={checkWeatherCount}
+          />
+        </span>
       </div>
       <div>
         {weatherForTrip ? (
@@ -143,10 +223,29 @@ const WeatherResults = ({
               })}
           </div>
         ) : (
-          "Loading..."
+          "Loading weather..."
         )}
       </div>
-      {/* <div>{tripResults ? JSON.stringify(tripResults) : ""}</div> */}
+      <div>
+        {weatherObjects ? (
+          <div className="weather-box">
+            {weatherObjects.map((obj, i) => {
+              return (
+                <div key={obj.coordinate}>
+                  <div>Location: {obj.coordinate}</div>
+                  <span>{obj.distance}</span>
+                  <div>
+                    Duration: {(obj.duration / 60 / 60).toFixed(2)} hrs.
+                  </div>
+                  <div>Weather: ...</div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          "Loading objs"
+        )}
+      </div>
     </>
   );
 };

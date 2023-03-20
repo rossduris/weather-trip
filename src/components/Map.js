@@ -41,8 +41,10 @@ const Map = ({
       }
     }, 1500);
 
-    if (responseCount === response.geocoded_waypoints.length) {
-      clearTimeout(myTimeout);
+    if (response) {
+      if (responseCount === response.geocoded_waypoints.length) {
+        clearTimeout(myTimeout);
+      }
     }
   }
 
@@ -70,20 +72,25 @@ const Map = ({
                 directions: response,
               }}
             />
-            {weatherForTrip
-              ? weatherForTrip.map((marker) => {
-                  const location = marker.location.split(",");
-                  return (
-                    <Marker
-                      onLoad={onLoad}
-                      position={{
-                        lat: Number(location[0]),
-                        lng: Number(location[1]),
-                      }}
-                      label={marker.text}
-                    />
-                  );
-                })
+            {coordinatesToCheck
+              ? coordinatesToCheck
+                  .filter((coord, i) => i != 0)
+                  .map((marker) => {
+                    let coordinate = marker.split(",");
+                    return marker ? (
+                      <Marker
+                        key={marker + "mark"}
+                        onLoad={onLoad}
+                        position={{
+                          lat: Number(coordinate[0]),
+                          lng: Number(coordinate[1]),
+                        }}
+                        label={marker.text}
+                      />
+                    ) : (
+                      ""
+                    );
+                  })
               : ""}
           </>
         ) : (
