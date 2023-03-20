@@ -233,7 +233,7 @@ const WeatherResults = ({
               return (
                 <div key={obj.coordinate}>
                   <div>Location: {obj.coordinate}</div>
-                  <span>{obj.distance}</span>
+                  <span>Distance: {obj.distance}</span>
                   <div>
                     Duration: {(obj.duration / 60 / 60).toFixed(2)} hrs.
                   </div>
