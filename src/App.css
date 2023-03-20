@@ -1,8 +1,14 @@
+body {
+  display: flex;
+  justify-content: center;
+}
 .app-wrapper {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   padding: 2em;
+  max-width: 800px;
 }
 
 .locationSearch {
@@ -28,4 +34,37 @@
 .weather-data button:disabled {
   background-color: rgb(14, 14, 171);
   cursor: default;
+}
+
+.marker-title {
+  font-size: 14px;
+  position: relative;
+  top: 4px;
+  left: 4px;
+}
+.data-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.weather-data input {
+  outline: none;
+  font-size: 0;
+  height: 28px;
+  width: 20px;
+  border: navajowhite;
+  padding: 8px;
+}
+
+.weather-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.weather-box > div {
+  border: 1px solid gray;
+}
+
+.weather-data {
+  min-width: 400px;
 }
