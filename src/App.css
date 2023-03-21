@@ -7,7 +7,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 2em;
+  padding: 2em 0;
   max-width: 800px;
 }
 
@@ -27,6 +27,7 @@ body {
   padding: 1em 2em;
   margin: 1em 0;
   cursor: pointer;
+  min-width: 150px;
 }
 .weather-data button:hover {
   background-color: darkblue;
@@ -41,6 +42,23 @@ body {
   position: relative;
   top: 4px;
   left: 4px;
+}
+.marker-title span:last-child {
+  position: absolute;
+  left: 0px;
+  font-size: 11px;
+  top: 24px;
+  font-style: italic;
+  color: gray;
+  width: 210px;
+}
+
+.marker-title #count {
+  font-size: 20px;
+  font-weight: bold;
+  top: 3px;
+  left: 2px;
+  position: relative;
 }
 .data-wrapper {
   display: grid;
@@ -63,8 +81,37 @@ body {
 
 .weather-box > div {
   border: 1px solid gray;
+  padding: 0.5em;
+  margin: 3px 0;
+  border-radius: 5px;
+  position: relative;
 }
 
 .weather-data {
   min-width: 400px;
+}
+
+.marker-count-wrapper {
+  margin: 0 1em;
+  position: relative;
+  top: -12px;
+  left: 10px;
+}
+
+.weather-img {
+  position: absolute;
+  right: 1em;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.destination,
+.origin {
+  /* float: right; */
+  color: rgb(15, 107, 15);
+  font-weight: bold;
+  font-size: 14px;
+}
+.origin {
+  color: rgb(228, 153, 13);
 }

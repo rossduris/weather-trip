@@ -6,19 +6,28 @@ const WeatherResults = ({
   setRoute,
   weatherForTrip,
   setWeatherForTrip,
+  weatherObjects,
+  setWeatherObjects,
   setResponseCount,
   setCoordinatesToCheck,
 }) => {
   const [tripResults, setTripResults] = useState();
   const [loading, setLoading] = useState(false);
   const [checkWeatherCount, setCheckWeatherCount] = useState(2);
-  const [weatherObjects, setWeatherObjects] = useState([]);
+  const [forecastData, setForecastData] = useState();
+  const [weatherData, setWeatherData] = useState([]);
   const [distanceData, setDistanceData] = useState();
+
+  let forecast = [];
+  let results = [];
 
   async function getTripPlan() {
     setLoading(true);
     setResponseCount(0);
     setTripResults(null);
+    setForecastData(null);
+    setWeatherData([]);
+    forecast = [];
     const options = {
       method: "GET",
       url: "https://multimodal-trip-planner.p.rapidapi.com/v1/routing",
@@ -47,9 +56,7 @@ const WeatherResults = ({
       });
   }
 
-  let results = [];
-
-  const getWeather = (coordinate, hour) => {
+  const getWeather = (coordinate, hour, index) => {
     const options = {
       method: "GET",
       url: "https://weatherapi-com.p.rapidapi.com/forecast.json",
@@ -62,21 +69,28 @@ const WeatherResults = ({
 
     axios
       .request(options)
-      .then(function (response) {
-        const weatherText =
-          response.data.forecast.forecastday[0].hour[hour].condition.text;
-        results.push({
-          location: coordinate,
-          hour: hour,
-          text: weatherText,
-        });
+      .then((response) => {
+        // const text = response.data.forecast.forecastday[0].hour[hour].condition.text;
+        // const temp = response.data.forecast.forecastday[0].hour[hour]
+        // forecast.push(response.data.forecast.forecastday[0].hour[hour])
+        // const forecastArray = [...weatherData];
+        setWeatherData((prev) => [
+          ...prev,
+          response.data.forecast.forecastday[0].hour[hour],
+        ]);
       })
-      .catch(function (error) {
+      .catch((error) => {
         console.error(error);
       });
   };
 
-  function getDistance(origins, destinations) {
+  useEffect(() => {
+    if (weatherData) {
+      console.log(weatherData);
+    }
+  }, [weatherData]);
+
+  async function getDistance(origins, destinations) {
     const options = {
       method: "GET",
       url: "https://trueway-matrix.p.rapidapi.com/CalculateDrivingMatrix",
@@ -90,7 +104,7 @@ const WeatherResults = ({
       },
     };
 
-    axios
+    await axios
       .request(options)
       .then(function (response) {
         setDistanceData(response.data);
@@ -160,26 +174,28 @@ const WeatherResults = ({
       }
 
       console.log(origins, destinations);
-      getDistance(origins, destinations);
-
-      // setWeatherForTrip(results);
+      getDistance(origins, destinations).then(setLoading(false));
     }
-
-    setLoading(false);
   }, [tripResults]);
 
   useEffect(() => {
+    setWeatherData([]);
     if (distanceData) {
       weatherObjects
         ? weatherObjects.forEach((obj, i) => {
+            const duration = Math.round(obj.duration / 60 / 60);
+            getWeather(obj.coordinate, duration, i);
+            obj.weather = forecast ? forecast[i] : "Loading...";
             if (i != 0) {
               obj.duration = distanceData.durations[0][i - 1];
               obj.distance = distanceData.distances[0][i - 1];
             }
           })
         : console.log("no objs yet");
+
       setWeatherObjects((prev) => prev);
-      console.log(weatherObjects);
+
+      console.log("forecast: ", forecastData);
     } else {
       console.log("no data");
     }
@@ -191,10 +207,12 @@ const WeatherResults = ({
         <button onClick={getTripPlan} disabled={loading}>
           {loading ? "Loading..." : "Get Weather"}
         </button>
-        <span>
+        <span className="marker-count-wrapper">
           <span className="marker-title">
-            Marker Count: {checkWeatherCount - 1}
+            Checkpoints: <span id="count">{Number(checkWeatherCount) - 1}</span>
+            <span>Including origin & destination.</span>
           </span>
+
           <input
             min={2}
             max={20}
@@ -205,7 +223,7 @@ const WeatherResults = ({
           />
         </span>
       </div>
-      <div>
+      {/* <div>
         {weatherForTrip ? (
           <div>
             {weatherForTrip
@@ -225,7 +243,7 @@ const WeatherResults = ({
         ) : (
           "Loading weather..."
         )}
-      </div>
+      </div> */}
       <div>
         {weatherObjects ? (
           <div className="weather-box">
@@ -235,9 +253,33 @@ const WeatherResults = ({
                   <div>Location: {obj.coordinate}</div>
                   <span>Distance: {obj.distance}</span>
                   <div>
-                    Duration: {(obj.duration / 60 / 60).toFixed(2)} hrs.
+                    Duration:{" "}
+                    {loading
+                      ? "Loading..."
+                      : (obj.duration / 60 / 60).toFixed(2)}{" "}
+                    hrs.
                   </div>
-                  <div>Weather: ...</div>
+                  <div>
+                    Weather:{" "}
+                    {weatherData[i]
+                      ? weatherData[i].condition.text
+                      : "loading..."}
+                  </div>
+                  {weatherData[i] ? (
+                    <img
+                      className="weather-img"
+                      src={`https:${weatherData[i].condition.icon}`}
+                    />
+                  ) : (
+                    console.log("no url...")
+                  )}
+                  {i === 0 ? (
+                    <span className="origin">Origin</span>
+                  ) : i === weatherObjects.length - 1 ? (
+                    <span className="destination">Destination</span>
+                  ) : (
+                    ""
+                  )}
                 </div>
               );
             })}

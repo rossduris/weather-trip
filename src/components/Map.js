@@ -23,6 +23,7 @@ const Map = ({
   coordinatesToCheck,
   weatherForTrip,
   setWeatherForTrip,
+  weatherObjects,
 }) => {
   const [response, setResponse] = useState("");
 
@@ -72,20 +73,27 @@ const Map = ({
                 directions: response,
               }}
             />
-            {coordinatesToCheck
-              ? coordinatesToCheck
-                  .filter((coord, i) => i != 0)
+            {weatherObjects
+              ? weatherObjects
+                  .filter(
+                    (marker, i) => i != 0 && i != weatherObjects.length - 1
+                  )
                   .map((marker) => {
-                    let coordinate = marker.split(",");
+                    let coordinate = marker.coordinate.split(",");
                     return marker ? (
                       <Marker
-                        key={marker + "mark"}
+                        key={"key" + marker.coordinate}
                         onLoad={onLoad}
+                        defa
                         position={{
                           lat: Number(coordinate[0]),
                           lng: Number(coordinate[1]),
                         }}
-                        label={marker.text}
+                        // icon={{
+                        //   // path: google.maps.SymbolPath.CIRCLE,
+                        //   url: "https://cdn.weatherapi.com/weather/64x64/night/122.png",
+                        //   scale: 3,
+                        // }}
                       />
                     ) : (
                       ""
