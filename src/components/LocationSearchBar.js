@@ -97,11 +97,13 @@ const LocationSearchBar = ({ type, tripData, setTripData }) => {
         type="text"
         placeholder={type === "start" ? "Start Location" : "End Location"}
         onChange={handleChange}
+        maxLength={50}
+        required
         value={
           !searchValue && type === "start"
-            ? "Savannah, GA"
+            ? ""
             : !searchValue && type === "end"
-            ? "Atlanta, GA"
+            ? ""
             : searchValue
         }
       />

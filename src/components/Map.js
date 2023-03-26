@@ -17,12 +17,10 @@ const containerStyle = {
 
 const Map = ({
   route,
-  setRoute,
+
   responseCount,
   setResponseCount,
-  coordinatesToCheck,
-  weatherForTrip,
-  setWeatherForTrip,
+  weatherData,
   weatherObjects,
 }) => {
   const [response, setResponse] = useState("");
@@ -78,7 +76,7 @@ const Map = ({
                   .filter(
                     (marker, i) => i != 0 && i != weatherObjects.length - 1
                   )
-                  .map((marker) => {
+                  .map((marker, i) => {
                     let coordinate = marker.coordinate.split(",");
                     return marker ? (
                       <Marker
@@ -89,11 +87,17 @@ const Map = ({
                           lat: Number(coordinate[0]),
                           lng: Number(coordinate[1]),
                         }}
-                        // icon={{
-                        //   // path: google.maps.SymbolPath.CIRCLE,
-                        //   url: "https://cdn.weatherapi.com/weather/64x64/night/122.png",
-                        //   scale: 3,
-                        // }}
+                        // icon={
+                        //   weatherData && weatherData[i]
+                        //     ? {
+                        //         // path: google.maps.SymbolPath.CIRCLE,
+                        //         url: weatherData[i]
+                        //           ? `https:${weatherData[i + 1].condition.icon}`
+                        //           : null,
+                        //         scale: 3,
+                        //       }
+                        //     : null
+                        // }
                       />
                     ) : (
                       ""

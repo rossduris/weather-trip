@@ -11,6 +11,7 @@ function App() {
   const [locationData, setLocationData] = useState([]);
   const [weatherForTrip, setWeatherForTrip] = useState();
   const [weatherObjects, setWeatherObjects] = useState([]);
+  const [weatherData, setWeatherData] = useState([]);
   const [tripData, setTripData] = useState({
     startLocation: {
       name: "Savannah, GA",
@@ -53,6 +54,8 @@ function App() {
       setWeatherForTrip={setWeatherForTrip}
       weatherObjects={weatherObjects}
       setWeatherObjects={setWeatherObjects}
+      weatherData={weatherData}
+      setWeatherData={setWeatherData}
     />
   );
   const weather = (
@@ -64,10 +67,10 @@ function App() {
       setRoute={setRoute}
       coordinatesToCheck={coordinatesToCheck}
       setCoordinatesToCheck={setCoordinatesToCheck}
-      weatherForTrip={weatherForTrip}
-      setWeatherForTrip={setWeatherForTrip}
       weatherObjects={weatherObjects}
       setWeatherObjects={setWeatherObjects}
+      weatherData={weatherData}
+      setWeatherData={setWeatherData}
     />
   );
 

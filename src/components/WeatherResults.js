@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 const WeatherResults = ({
   tripData,
   setRoute,
-  weatherForTrip,
-  setWeatherForTrip,
+  weatherData,
+  setWeatherData,
   weatherObjects,
   setWeatherObjects,
   setResponseCount,
@@ -15,7 +15,7 @@ const WeatherResults = ({
   const [loading, setLoading] = useState(false);
   const [checkWeatherCount, setCheckWeatherCount] = useState(2);
   const [forecastData, setForecastData] = useState();
-  const [weatherData, setWeatherData] = useState([]);
+
   const [distanceData, setDistanceData] = useState();
 
   let forecast = [];
@@ -72,23 +72,23 @@ const WeatherResults = ({
       .then((response) => {
         // const text = response.data.forecast.forecastday[0].hour[hour].condition.text;
         // const temp = response.data.forecast.forecastday[0].hour[hour]
-        // forecast.push(response.data.forecast.forecastday[0].hour[hour])
-        // const forecastArray = [...weatherData];
-        setWeatherData((prev) => [
-          ...prev,
-          response.data.forecast.forecastday[0].hour[hour],
-        ]);
+        forecast.push(response.data.forecast.forecastday[0].hour[hour]);
+        // setWeatherData((prev) => [
+        //   ...prev,
+        //   response.data.forecast.forecastday[0].hour[hour],
+        // ]);
+      })
+      .then(() => {
+        forecast.sort((a, b) => (a.time > b.time ? 1 : -1));
+        console.log(forecast.forEach((item) => console.log(item)));
+        if (forecast.length === weatherObjects.length) {
+          setWeatherData(forecast);
+        }
       })
       .catch((error) => {
         console.error(error);
       });
   };
-
-  useEffect(() => {
-    if (weatherData) {
-      console.log(weatherData);
-    }
-  }, [weatherData]);
 
   async function getDistance(origins, destinations) {
     const options = {
@@ -117,6 +117,9 @@ const WeatherResults = ({
   useEffect(() => {
     const tripCoords = [];
     const tripObjs = [];
+
+    setForecastData(null);
+    forecast = [];
     // Find trip distance in hours
     if (tripResults) {
       const coords = new Array(
@@ -175,27 +178,24 @@ const WeatherResults = ({
 
       console.log(origins, destinations);
       getDistance(origins, destinations).then(setLoading(false));
+
+      setForecastData(forecast);
     }
   }, [tripResults]);
 
   useEffect(() => {
-    setWeatherData([]);
     if (distanceData) {
       weatherObjects
         ? weatherObjects.forEach((obj, i) => {
-            const duration = Math.round(obj.duration / 60 / 60);
-            getWeather(obj.coordinate, duration, i);
-            obj.weather = forecast ? forecast[i] : "Loading...";
             if (i != 0) {
               obj.duration = distanceData.durations[0][i - 1];
               obj.distance = distanceData.distances[0][i - 1];
             }
+            const duration = Math.round(obj.duration / 60 / 60);
+            console.log("getting weather for hour: ", duration);
+            getWeather(obj.coordinate, duration, i);
           })
         : console.log("no objs yet");
-
-      setWeatherObjects((prev) => prev);
-
-      console.log("forecast: ", forecastData);
     } else {
       console.log("no data");
     }
@@ -216,7 +216,9 @@ const WeatherResults = ({
           <input
             min={2}
             max={20}
-            onChange={(e) => setCheckWeatherCount(e.target.value)}
+            onChange={(e) =>
+              setCheckWeatherCount(e.target.value) && setWeatherData([])
+            }
             type="number"
             placeholder="Weather Checkpoints"
             value={checkWeatherCount}
@@ -259,19 +261,25 @@ const WeatherResults = ({
                       : (obj.duration / 60 / 60).toFixed(2)}{" "}
                     hrs.
                   </div>
+                  {/* <div>Weather: {obj.weather}</div> */}
                   <div>
                     Weather:{" "}
-                    {weatherData[i]
-                      ? weatherData[i].condition.text
-                      : "loading..."}
+                    {weatherData && weatherData[i] ? (
+                      <>
+                        <div>{weatherData[i].time}</div>
+                        {weatherData[i].condition.text}
+                      </>
+                    ) : (
+                      "loading..."
+                    )}
                   </div>
-                  {weatherData[i] ? (
+                  {weatherData && weatherData[i] ? (
                     <img
                       className="weather-img"
                       src={`https:${weatherData[i].condition.icon}`}
                     />
                   ) : (
-                    console.log("no url...")
+                    ""
                   )}
                   {i === 0 ? (
                     <span className="origin">Origin</span>
