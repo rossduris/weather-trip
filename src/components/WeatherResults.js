@@ -60,7 +60,7 @@ const WeatherResults = ({
     const options = {
       method: "GET",
       url: "https://weatherapi-com.p.rapidapi.com/forecast.json",
-      params: { q: coordinate },
+      params: { q: coordinate, days: 2 },
       headers: {
         "X-RapidAPI-Key": process.env.REACT_APP_RAPID_API_KEY,
         "X-RapidAPI-Host": "weatherapi-com.p.rapidapi.com",
@@ -70,17 +70,15 @@ const WeatherResults = ({
     axios
       .request(options)
       .then((response) => {
-        // const text = response.data.forecast.forecastday[0].hour[hour].condition.text;
-        // const temp = response.data.forecast.forecastday[0].hour[hour]
-        forecast.push(response.data.forecast.forecastday[0].hour[hour]);
-        // setWeatherData((prev) => [
-        //   ...prev,
-        //   response.data.forecast.forecastday[0].hour[hour],
-        // ]);
+        if (hour < 24) {
+          forecast.push(response.data.forecast.forecastday[0].hour[hour]);
+        } else if (hour > 24 && hour < 48) {
+          forecast.push(response.data.forecast.forecastday[1].hour[hour - 24]);
+        }
       })
       .then(() => {
         forecast.sort((a, b) => (a.time > b.time ? 1 : -1));
-        console.log(forecast.forEach((item) => console.log(item)));
+
         if (forecast.length === weatherObjects.length) {
           setWeatherData(forecast);
         }
@@ -176,7 +174,6 @@ const WeatherResults = ({
         }
       }
 
-      console.log(origins, destinations);
       getDistance(origins, destinations).then(setLoading(false));
 
       setForecastData(forecast);
@@ -192,8 +189,10 @@ const WeatherResults = ({
               obj.distance = distanceData.distances[0][i - 1];
             }
             const duration = Math.round(obj.duration / 60 / 60);
-            console.log("getting weather for hour: ", duration);
-            getWeather(obj.coordinate, duration, i);
+            const time = new Date();
+            const timeToCheck = Number(time.getHours() + duration);
+            console.log("getting weather for time: ", timeToCheck);
+            getWeather(obj.coordinate, timeToCheck, i);
           })
         : console.log("no objs yet");
     } else {
@@ -277,7 +276,7 @@ const WeatherResults = ({
                   <div>
                     {weatherData && weatherData[i] ? (
                       <>
-                        {/* <div>{weatherData[i].time}</div> */}
+                        <div>{weatherData[i].time}</div>
                         <div>Temp: {weatherData[i].temp_f}&#176;F</div>
                         {weatherData[i].condition.text}
                       </>
