@@ -214,14 +214,18 @@ const WeatherResults = ({
               <div
                 onClick={() => {
                   if (checkWeatherCount > 1) {
-                    setCheckWeatherCount((prev) => Number(prev) - 1);
+                    setCheckWeatherCount(
+                      (prev) => Number(checkWeatherCount) - 1
+                    );
                   }
                 }}
               >
                 -
               </div>
               <div
-                onClick={() => setCheckWeatherCount((prev) => Number(prev) + 1)}
+                onClick={() =>
+                  setCheckWeatherCount((prev) => Number(checkWeatherCount) + 1)
+                }
               >
                 +
               </div>
