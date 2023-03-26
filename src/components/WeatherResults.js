@@ -263,10 +263,10 @@ const WeatherResults = ({
                   </div>
                   {/* <div>Weather: {obj.weather}</div> */}
                   <div>
-                    Weather:{" "}
                     {weatherData && weatherData[i] ? (
                       <>
-                        <div>{weatherData[i].time}</div>
+                        {/* <div>{weatherData[i].time}</div> */}
+                        <div>Temp: {weatherData[i].temp_f}</div>
                         {weatherData[i].condition.text}
                       </>
                     ) : (
