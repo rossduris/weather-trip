@@ -45,12 +45,27 @@ body {
 }
 .marker-title span:last-child {
   position: absolute;
-  left: 0px;
-  font-size: 11px;
-  top: 24px;
-  font-style: italic;
-  color: gray;
+  right: -250px;
+  font-size: 16px;
+  top: 0px;
+  user-select: none;
+  font-weight: bold;
+  color: black;
   width: 210px;
+  display: flex;
+}
+.marker-title span:last-child div {
+  cursor: pointer;
+  padding: 3px;
+  border: 1px solid gray;
+  margin: 2px 8px;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+}
+.marker-title span:last-child div:hover {
+  background-color: gainsboro;
 }
 
 .marker-title #count {
@@ -67,13 +82,12 @@ body {
 
 .weather-data input {
   outline: none;
-  font-size: 0;
+  font-size: 14px;
   height: 28px;
-  width: 20px;
+  width: 100px;
   border: navajowhite;
   padding: 8px;
 }
-
 .weather-box {
   display: flex;
   flex-direction: column;

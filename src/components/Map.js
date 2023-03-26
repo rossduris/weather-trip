@@ -73,9 +73,9 @@ const Map = ({
             />
             {weatherObjects
               ? weatherObjects
-                  .filter(
-                    (marker, i) => i != 0 && i != weatherObjects.length - 1
-                  )
+                  // .filter(
+                  //   (marker, i) => i != 0 && i != weatherObjects.length - 1
+                  // )
                   .map((marker, i) => {
                     let coordinate = marker.coordinate.split(",");
                     return marker ? (
@@ -87,17 +87,17 @@ const Map = ({
                           lat: Number(coordinate[0]),
                           lng: Number(coordinate[1]),
                         }}
-                        // icon={
-                        //   weatherData && weatherData[i]
-                        //     ? {
-                        //         // path: google.maps.SymbolPath.CIRCLE,
-                        //         url: weatherData[i]
-                        //           ? `https:${weatherData[i + 1].condition.icon}`
-                        //           : null,
-                        //         scale: 3,
-                        //       }
-                        //     : null
-                        // }
+                        icon={
+                          weatherData && weatherData[i]
+                            ? {
+                                // path: google.maps.SymbolPath.CIRCLE,
+                                url: weatherData[i]
+                                  ? `https:${weatherData[i].condition.icon}`
+                                  : null,
+                                scale: 3,
+                              }
+                            : null
+                        }
                       />
                     ) : (
                       ""

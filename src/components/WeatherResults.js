@@ -13,7 +13,7 @@ const WeatherResults = ({
 }) => {
   const [tripResults, setTripResults] = useState();
   const [loading, setLoading] = useState(false);
-  const [checkWeatherCount, setCheckWeatherCount] = useState(2);
+  const [checkWeatherCount, setCheckWeatherCount] = useState(1);
   const [forecastData, setForecastData] = useState();
 
   const [distanceData, setDistanceData] = useState();
@@ -209,20 +209,24 @@ const WeatherResults = ({
         </button>
         <span className="marker-count-wrapper">
           <span className="marker-title">
-            Checkpoints: <span id="count">{Number(checkWeatherCount) - 1}</span>
-            <span>Including origin & destination.</span>
+            Checkpoints: <span id="count">{Number(checkWeatherCount) + 1}</span>
+            <span>
+              <div
+                onClick={() => {
+                  if (checkWeatherCount > 1) {
+                    setCheckWeatherCount((prev) => Number(prev) - 1);
+                  }
+                }}
+              >
+                -
+              </div>
+              <div
+                onClick={() => setCheckWeatherCount((prev) => Number(prev) + 1)}
+              >
+                +
+              </div>
+            </span>
           </span>
-
-          <input
-            min={2}
-            max={20}
-            onChange={(e) =>
-              setCheckWeatherCount(e.target.value) && setWeatherData([])
-            }
-            type="number"
-            placeholder="Weather Checkpoints"
-            value={checkWeatherCount}
-          />
         </span>
       </div>
       {/* <div>
@@ -253,20 +257,24 @@ const WeatherResults = ({
               return (
                 <div key={obj.coordinate}>
                   <div>Location: {obj.coordinate}</div>
-                  <span>Distance: {obj.distance}</span>
-                  <div>
-                    Duration:{" "}
-                    {loading
-                      ? "Loading..."
-                      : (obj.duration / 60 / 60).toFixed(2)}{" "}
-                    hrs.
-                  </div>
+                  {/* <span>Distance: {obj.distance}</span> */}
+                  {i != 0 ? (
+                    <div>
+                      Duration:{" "}
+                      {loading
+                        ? "Loading..."
+                        : (obj.duration / 60 / 60).toFixed(2)}{" "}
+                      hrs.
+                    </div>
+                  ) : (
+                    ""
+                  )}
                   {/* <div>Weather: {obj.weather}</div> */}
                   <div>
                     {weatherData && weatherData[i] ? (
                       <>
                         {/* <div>{weatherData[i].time}</div> */}
-                        <div>Temp: {weatherData[i].temp_f}</div>
+                        <div>Temp: {weatherData[i].temp_f}&#176;F</div>
                         {weatherData[i].condition.text}
                       </>
                     ) : (
