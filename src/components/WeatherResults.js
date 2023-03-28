@@ -190,7 +190,12 @@ const WeatherResults = ({
             }
             const duration = Math.round(obj.duration / 60 / 60);
             const time = new Date();
-            const timeToCheck = Number(time.getHours() + duration);
+            const minuets = time.getMinutes();
+            console.log("minuets: ", minuets);
+            let timeToCheck = Number(time.getHours() + duration);
+            if (minuets > 30) {
+              timeToCheck = timeToCheck + 1;
+            }
             console.log("getting weather for time: ", timeToCheck);
             getWeather(obj.coordinate, timeToCheck, i);
           })
