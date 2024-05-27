@@ -109,18 +109,15 @@ const LocationSearchBar = ({ type, tripData, setTripData }) => {
       />
       {isSearching ? (
         searchResults && searchResults.features && searchResults.features[0] ? (
-          <div className="searchResults" onClick={handleLocationClick}>
-            <div>{searchResults.features[0].properties.address_line1}</div>
+          <span className="searchResults" onClick={handleLocationClick}>
             <div>
-              {searchResults.features[0].properties.lat},
-              {searchResults.features[0].properties.lon}
+              <div>{searchResults.features[0].properties.address_line1}</div>
+              <div>
+                {searchResults.features[0].properties.lat},
+                {searchResults.features[0].properties.lon}
+              </div>
             </div>
-            {/* <div>
-            {searchResults.features.map((prop) => {
-              return <div>{JSON.stringify(prop)}</div>;
-            })}
-          </div> */}
-          </div>
+          </span>
         ) : (
           ""
         )

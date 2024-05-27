@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import LocationSearchBar from "./components/LocationSearchBar";
 import WeatherResults from "./components/WeatherResults";
-import Map from "./components/Map";
+import MapboxMap from "./components/MapboxMap";
+import Footer from "./components/Footer";
 
 function App() {
   const [coordinatesToCheck, setCoordinatesToCheck] = useState([]);
@@ -14,15 +15,19 @@ function App() {
   const [weatherData, setWeatherData] = useState([]);
   const [tripData, setTripData] = useState({
     startLocation: {
-      name: "Savannah, GA",
-      lat: "32.0564572",
-      lon: "-81.0951271",
+      name: "Columbus, OH",
+      lat: "39.9612",
+      lon: "-82.98333",
     },
-    endLocation: { name: "Atlanta, GA", lat: "33.7489924", lon: "-84.3902644" },
+    endLocation: {
+      name: "Cincinnati, OH",
+      lat: "39.103119",
+      lon: "-84.512016",
+    },
   });
   const [route, setRoute] = useState({
-    start: "Savannah, GA",
-    end: "Atlanta, GA",
+    start: "Columbus, OH",
+    end: "Cincinnati, OH",
   });
   const [responseCount, setResponseCount] = useState(0);
 
@@ -30,22 +35,8 @@ function App() {
     console.log(tripData);
   }
 
-  const startSearch = (
-    <LocationSearchBar
-      type="start"
-      tripData={tripData}
-      setTripData={setTripData}
-    />
-  );
-  const endSearch = (
-    <LocationSearchBar
-      type="end"
-      tripData={tripData}
-      setTripData={setTripData}
-    />
-  );
   const map = (
-    <Map
+    <MapboxMap
       responseCount={responseCount}
       setResponseCount={setResponseCount}
       route={route}
@@ -77,13 +68,24 @@ function App() {
   return (
     <>
       <div className="app-wrapper">
-        <div className="left-panel">
-          {startSearch}
-          {endSearch}
-          {map}
+        <div className="search-weather-wrapper">
+          <div className="search-wrapper">
+            <LocationSearchBar
+              type="start"
+              tripData={tripData}
+              setTripData={setTripData}
+            />
+            <LocationSearchBar
+              type="end"
+              tripData={tripData}
+              setTripData={setTripData}
+            />
+          </div>
+          <div className="weather-wrapper">{weather}</div>
         </div>
-        <div className="right-panel">{weather}</div>
+        {map}
       </div>
+      <Footer />
     </>
   );
 }

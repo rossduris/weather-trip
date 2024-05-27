@@ -1,18 +1,27 @@
 body {
-  display: flex;
-  justify-content: center;
 }
 .app-wrapper {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: start;
   align-items: center;
-  padding: 2em 0;
-  max-width: 800px;
+  padding: 4em 0;
+  width: 100%;
+  /* background: url("/public/map-holder.png") no-repeat; */
+  /* object-fit: cover;
+  min-height: 60vh; */
 }
 
 .locationSearch {
   width: 200px;
+}
+
+.site-logo {
+  width: 100px;
+  height: 100px;
+  background: url("/public/road-trip-forecast-logo-small.png") no-repeat;
+  object-fit: contain;
+  background-size: 100%;
 }
 
 .searchSuggestion {
@@ -128,4 +137,73 @@ body {
 }
 .origin {
   color: rgb(228, 153, 13);
+}
+
+.searchResults {
+  background-color: white;
+  position: absolute;
+  width: 400px;
+  display: flex;
+  left: 2px;
+  flex-direction: column;
+  border: 1px solid black;
+  padding: 2px;
+  z-index: 100;
+  cursor: pointer;
+}
+.searchResults > div {
+  padding: 10px;
+  border-bottom: 1px solid gray;
+}
+.searchResults > div:hover {
+  background-color: #f4f4f4;
+}
+
+.search-wrapper {
+  position: relative;
+  z-index: 10;
+}
+
+.search-wrapper > div {
+  width: 100%;
+}
+
+.locationSearch input {
+  width: 100%;
+  padding: 10px 0;
+  font-size: 18px;
+  margin-bottom: 10px;
+  border-radius: 15px;
+  border: 1px solid gray;
+  text-indent: 10px;
+}
+
+.weather-wrapper {
+  background-color: transparent;
+  z-index: 10;
+}
+
+.footer-logo-wrapper {
+  background-color: rgba(255, 255, 255, 0.4);
+  user-select: none;
+  z-index: 10;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  padding: 30px 0 20px;
+}
+.weather-button {
+  border-radius: 10px;
+}
+
+.search-weather-wrapper {
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 20px;
+  padding-bottom: 10px;
+  box-shadow: 0px 0px 8px #9a9a9a;
+  animation-fill-mode: forwards; /* Ensures the animation stays at the final state */
 }

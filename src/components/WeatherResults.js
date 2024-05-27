@@ -200,15 +200,17 @@ const WeatherResults = ({
             getWeather(obj.coordinate, timeToCheck, i);
           })
         : console.log("no objs yet");
-    } else {
-      console.log("no data");
     }
   }, [distanceData]);
 
   return (
     <>
       <div className="weather-data">
-        <button onClick={getTripPlan} disabled={loading}>
+        <button
+          className="weather-button"
+          onClick={getTripPlan}
+          disabled={loading}
+        >
           {loading ? "Loading..." : "Get Weather"}
         </button>
         <span className="marker-count-wrapper">
